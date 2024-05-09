@@ -1,0 +1,15 @@
+[submodule "kitchen-core"]
+	path = kitchen-core
+	url = git@github.com:leugin/kitchen-core.git
+[submodule "kitchen-auth"]
+	path = kitchen-auth
+	url = git@github.com:leugin/kitchen-auth.git
+[submodule "kitchen"]
+	path = kitchen
+	url = git@github.com:leugin/kitchen.git
+[submodule "remote-auth"]
+	path = remote-auth
+	url = git@github.com:leugin/remote-auth.git
+[submodule "kitchen-warehouse"]
+	path = kitchen-warehouse
+	url = git@github.com:leugin/kitchen-warehouse.git

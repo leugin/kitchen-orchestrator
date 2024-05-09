@@ -1,0 +1,30 @@
+http:
+  routers:
+    kitchen_auth:
+      entryPoints:
+        - http
+      service: kitchen_auth
+      rule: '(Host(`api.kitchen.localhost`) && PathPrefix(`/oauth/`))'
+    kitchen:
+      entryPoints:
+        - http
+      service: kitchen
+      rule: '(Host(`api.kitchen.localhost`) && PathPrefix(`/kitchen/`))'
+    kitchen_warehouse:
+      entryPoints:
+        - http
+      service: kitchen_warehouse
+      rule: '(Host(`api.kitchen.localhost`) && PathPrefix(`/warehouse/`))'
+  services:
+    kitchen_auth:
+      loadBalancer:
+        servers:
+          - url: 'http://kitchen_auth'
+    kitchen:
+      loadBalancer:
+        servers:
+          - url: 'http://kitchen'
+    kitchen_warehouse:
+      loadBalancer:
+        servers:
+          - url: 'http://kitchen_warehouse'
