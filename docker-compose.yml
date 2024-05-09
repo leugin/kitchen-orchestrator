@@ -106,7 +106,7 @@ services:
 volumes:
   kitchen_mysql_volume:
     driver: local
-  kitchen_rabbitmq-volume:
+  kitchen_rabbitmq_volume:
     driver: local
   kitchen_redis_volume:
     driver: local
