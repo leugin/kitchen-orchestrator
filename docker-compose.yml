@@ -1,0 +1,116 @@
+services:
+  traefik:
+    hostname: traefik
+    image: traefik:latest
+    command:
+      - --api.insecure=true
+      - --api.dashboard=true
+      - --api.debug=true
+      - --log.level=DEBUG
+      - --providers.docker=true
+    ports:
+      - "80:80"
+      - "8080:8080"
+    labels:
+      - traefik.enable=true
+    volumes:
+      - ./traefik/logs:/data/logs
+      - ./traefik/traefik.yml:/etc/traefik/traefik.yml
+      - ./traefik/redirect.yml:/etc/traefik/dynamic/redirect.yml
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - kitchen_net
+    depends_on:
+      - kitchen_auth
+      - kitchen
+      - kitchen_warehouse
+  kitchen_auth:
+    hostname: kitchen_auth
+    working_dir: /var/www/html
+    build:
+      context: ./kitchen-auth
+    networks:
+      - kitchen_net
+    depends_on:
+      - mysql
+    ports:
+      - "${KITCHEN_AUTH_PORT:-10082}:80"
+    volumes:
+      - ./kitchen-auth:/var/www/html
+      - ./kitchen-core:/var/www/kitchen-core
+    command: php artisan serve --host=0.0.0.0 --port=80
+  kitchen:
+    hostname: kitchen
+    working_dir: /var/www/html
+    build:
+      context: ./kitchen
+    networks:
+      - kitchen_net
+    depends_on:
+      - mysql
+    ports:
+      - "${KITCHEN_PORT:-10081}:80"
+    volumes:
+      - ./kitchen:/var/www/html
+      - ./kitchen-core:/var/www/kitchen-core
+      - ./remote-auth:/var/www/remote-auth
+    command: php artisan serve --host=0.0.0.0 --port=80
+  kitchen_warehouse:
+    hostname: kitchen_warehouse
+    working_dir: /var/www/html
+    build:
+      context: ./kitchen-warehouse
+    networks:
+      - kitchen_net
+    depends_on:
+      - mysql
+    ports:
+      - "${KITCHEN_WAREHOUSE_PORT:-10080}:80"
+    volumes:
+      - ./kitchen:/var/www/html
+      - ./kitchen-core:/var/www/kitchen-core
+      - ./remote-auth:/var/www/remote-auth
+    command: php artisan serve --host=0.0.0.0 --port=80
+  mysql:
+    hostname: mysql
+    build:
+      context: docker/mysql
+    platform: linux/x86_64
+    ports:
+      - "${DB_PORT:-3306}:3306"
+    environment:
+      MYSQL_DATABASE: "${DB_DATABASE}"
+      MYSQL_PASSWORD: "${DB_USERNAME}"
+      MYSQL_ROOT_PASSWORD: "${DB_PASSWORD}"
+    volumes:
+      - kitchen_mysql_volume:/var/lib/mysql
+    networks:
+      - kitchen_net
+  rabbitmq:
+    image: rabbitmq:management-alpine
+    ports:
+      - "${FORWARD_RABBITMQ_CONNECT_PORT:-5672}:5672"
+      - "${FORWARD_RABBITMQ_ADMIN_PORT:-15672}:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: "${RABBITMQ_USER}"
+      RABBITMQ_DEFAULT_PASS: "${RABBITMQ_PASSWORD}"
+      RABBITMQ_DEFAULT_VHOST: /
+    volumes:
+      - kitchen_rabbitmq_volume:/var/lib/rabbitmq
+  redis:
+    image: redis:latest
+    ports:
+      - "${FORWARD_REDIS_PORT:-6379}:6379"
+    volumes:
+      - kitchen_redis_volume:/data
+volumes:
+  kitchen_mysql_volume:
+    driver: local
+  kitchen_rabbitmq-volume:
+    driver: local
+  kitchen_redis_volume:
+    driver: local
+
+networks:
+  kitchen_net:
+    driver: bridge

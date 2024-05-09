@@ -1,0 +1,48 @@
+services:
+  kitchen_auth:
+    hostname: kitchen-auth
+    working_dir: /var/www/html
+    build:
+      context: ./kitchen-auth
+    volumes:
+      - ./kitchen-auth:/var/www/html
+      - ./kitchen-core:/var/www/kitchen-core
+      - ./scripts:/var/www/scripts
+    command: sh ../scripts/laravel_start.sh
+    depends_on:
+      - kitchen_core
+  kitchen:
+    hostname: kitchen
+    working_dir: /var/www/html
+    build:
+      context: ./kitchen
+    volumes:
+      - ./kitchen:/var/www/html
+      - ./kitchen-core:/var/www/kitchen-core
+      - ./remote-auth:/var/www/remote-auth
+      - ./scripts:/var/www/scripts
+
+    command: sh ../scripts/laravel_start.sh
+    depends_on:
+      - kitchen_core
+  kitchen_warehouse:
+    hostname: kitchen-warehouse
+    working_dir: /var/www/html
+    build:
+      context: ./kitchen-warehouse
+    volumes:
+      - ./kitchen:/var/www/html
+      - ./kitchen-core:/var/www/kitchen-core
+      - ./remote-auth:/var/www/remote-auth
+      - ./scripts:/var/www/scripts
+
+    command: sh ../scripts/laravel_start.sh
+    depends_on:
+      - kitchen_core
+  kitchen_core:
+    hostname: kitchen-core
+    build:
+      context: ./kitchen-core
+    volumes:
+      - ./kitchen-core:/var/www/html
+    command: composer install
