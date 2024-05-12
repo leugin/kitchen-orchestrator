@@ -15,6 +15,11 @@ http:
         - http
       service: kitchen_warehouse
       rule: '(Host(`api.kitchen.localhost`) && PathPrefix(`/warehouse/`))'
+    kitchen_admin:
+      entryPoints:
+        - http
+      service: kitchen_admin
+      rule: 'Host(`kitchen.localhost`)'
   services:
     kitchen_auth:
       loadBalancer:
@@ -28,3 +33,7 @@ http:
       loadBalancer:
         servers:
           - url: 'http://kitchen_warehouse'
+    kitchen_admin:
+      loadBalancer:
+        servers:
+          - url: 'http://kitchen_admin'

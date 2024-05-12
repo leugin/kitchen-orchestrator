@@ -75,6 +75,21 @@ services:
       - ./kitchen-core:/var/www/kitchen-core
       - ./remote-auth:/var/www/remote-auth
     command: php artisan serve --host=0.0.0.0 --port=80
+  kitchen_admin:
+    hostname: kitchen_admin
+    working_dir: /app
+    build:
+      context: ./kitchen-admin
+    networks:
+      - kitchen_net
+    depends_on:
+      - mysql
+      - redis
+    ports:
+      - "${KITCHEN_ADMIN_PORT:-8081}:80"
+    volumes:
+      - ./kitchen-admin:/app
+    command: npm run dev
   mysql:
     hostname: mysql
     build:

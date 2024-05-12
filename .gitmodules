@@ -13,3 +13,6 @@
 [submodule "kitchen-warehouse"]
 	path = kitchen-warehouse
 	url = git@github.com:leugin/kitchen-warehouse.git
+[submodule "kitchen-admin"]
+	path = kitchen-admin
+	url = git@github.com:leugin/kitchen-admin.git

@@ -46,3 +46,10 @@ services:
     volumes:
       - ./kitchen-core:/var/www/html
     command: composer install
+  kitchen_admin:
+    hostname: kitchen-admin
+    build:
+      context: ./kitchen-admin
+    volumes:
+      - ./kitchen-admin:/app
+    command: ls -l
