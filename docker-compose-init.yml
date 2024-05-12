@@ -31,7 +31,7 @@ services:
     build:
       context: ./kitchen-warehouse
     volumes:
-      - ./kitchen:/var/www/html
+      - ./kitchen-warehouse:/var/www/html
       - ./kitchen-core:/var/www/kitchen-core
       - ./remote-auth:/var/www/remote-auth
       - ./scripts:/var/www/scripts

@@ -48,6 +48,9 @@ services:
       - kitchen_net
     depends_on:
       - mysql
+      - kitchen_auth
+      - rabbitmq
+      - redis
     ports:
       - "${KITCHEN_PORT:-10081}:80"
     volumes:
@@ -64,10 +67,11 @@ services:
       - kitchen_net
     depends_on:
       - mysql
+      - redis
     ports:
       - "${KITCHEN_WAREHOUSE_PORT:-10080}:80"
     volumes:
-      - ./kitchen:/var/www/html
+      - ./kitchen-warehouse:/var/www/html
       - ./kitchen-core:/var/www/kitchen-core
       - ./remote-auth:/var/www/remote-auth
     command: php artisan serve --host=0.0.0.0 --port=80
@@ -76,8 +80,6 @@ services:
     build:
       context: docker/mysql
     platform: linux/x86_64
-    ports:
-      - "${DB_PORT:-3306}:3306"
     environment:
       MYSQL_DATABASE: "${DB_DATABASE}"
       MYSQL_PASSWORD: "${DB_USERNAME}"
@@ -89,7 +91,6 @@ services:
   rabbitmq:
     image: rabbitmq:management-alpine
     ports:
-      - "${FORWARD_RABBITMQ_CONNECT_PORT:-5672}:5672"
       - "${FORWARD_RABBITMQ_ADMIN_PORT:-15672}:15672"
     environment:
       RABBITMQ_DEFAULT_USER: "${RABBITMQ_USER}"
@@ -97,12 +98,16 @@ services:
       RABBITMQ_DEFAULT_VHOST: /
     volumes:
       - kitchen_rabbitmq_volume:/var/lib/rabbitmq
+    networks:
+      - kitchen_net
   redis:
     image: redis:latest
     ports:
       - "${FORWARD_REDIS_PORT:-6379}:6379"
     volumes:
       - kitchen_redis_volume:/data
+    networks:
+      - kitchen_net
 volumes:
   kitchen_mysql_volume:
     driver: local
