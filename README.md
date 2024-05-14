@@ -3,6 +3,9 @@
 
 Main Kitchen project
 
+![architecture](./docs/assests/arquitecture.svg)
+
+
 ## Authors
 
 - [@Miguel Quevedo](https://github.com/leugin)
