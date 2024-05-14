@@ -52,4 +52,4 @@ services:
       context: ./kitchen-admin
     volumes:
       - ./kitchen-admin:/app
-    command: ls -l
+    command: npm install
